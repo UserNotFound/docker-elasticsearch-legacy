@@ -73,13 +73,13 @@ if [[ "$uid" != "$(get_license_uid)" ]]; then
 fi
 
 echo "Destroying"
-docker stop "$DB_CONTAINER"
-docker rm "$DB_CONTAINER"
+docker stop "$DB_CONTAINER" > /dev/null
+docker rm "$DB_CONTAINER" > /dev/null
 
 echo "Recreating"
 docker run -d --name="$DB_CONTAINER" \
   -e EXPOSE_HOST=127.0.0.1 -e EXPOSE_PORT_27217=27217 \
-  -e ELASTICSEARCH_XPACK="1" \
+  -e ELASTICSEARCH_XPACK="1"\
   --volumes-from "$DATA_CONTAINER" \
   "$IMG"
 wait_for_xpack
