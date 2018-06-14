@@ -1,8 +1,8 @@
 #!/usr/bin/env bats
 
-@test "It should install Elasticsearch 5.6.8" {
+@test "It should install Elasticsearch 5.6.10" {
   run elasticsearch-wrapper --version
-  [[ "$output" =~ "Version: 5.6.8"  ]]
+  [[ "$output" =~ "Version: 5.6.10"  ]]
 }
 
 @test "It should have the repository-s3 plugin installed" {
