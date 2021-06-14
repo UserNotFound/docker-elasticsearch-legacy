@@ -11,6 +11,12 @@ function setup_runtime_configuration() {
     | sed "s:DATA_DIRECTORY:${DATA_DIRECTORY}:g" \
     > "/elasticsearch/config/elasticsearch.yml"
 
+  persist_file="persist.yml"
+  EXTRA_FILE="${DATA_DIRECTORY}/${persist_file}"
+  if [ -f "$EXTRA_FILE" ]; then
+    cat "$EXTRA_FILE" >> "/elasticsearch/config/elasticsearch.yml"
+  fi
+
   mkdir -p "$SSL_DIRECTORY"
 
   local ssl_cert_file="${SSL_DIRECTORY}/server.crt"

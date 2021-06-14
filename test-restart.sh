@@ -9,6 +9,7 @@ DATA_CONTAINER="${DB_CONTAINER}-data"
 
 function cleanup {
   echo "Cleaning up"
+  rm -f /tmp/persist.yml
   docker rm -f "$DB_CONTAINER" "$DATA_CONTAINER" >/dev/null 2>&1 || true
 }
 
@@ -48,6 +49,11 @@ wait_for_db
 echo "Verifying DB shutdown message isn't present"
 docker logs "$DB_CONTAINER" 2>&1 | grep -vqiE "node.+closed"
 
+echo "Add a persistent node setting."
+touch /tmp/persist.yml
+echo 'thread_pool.bulk.queue_size: 200' > /tmp/persist.yml
+docker cp /tmp/persist.yml "$DB_CONTAINER":/var/db/
+
 echo "Restarting DB container"
 date
 docker top "$DB_CONTAINER"
@@ -59,6 +65,9 @@ wait_for_db
 echo "DB came back online; checking for clean shutdown and recovery"
 date
 docker logs "$DB_CONTAINER" 2>&1 | grep -qiE "node.+closed"
+
+echo "Ensuring custom persistent setting remains."
+docker exec "$DB_CONTAINER" grep 'thread_pool.bulk.queue_size' /elasticsearch/config/elasticsearch.yml
 
 echo "Attempting unclean shutdown"
 docker kill -s KILL "$DB_CONTAINER"
